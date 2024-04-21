@@ -1,16 +1,12 @@
+require("dotenv").config();
 const Api = require("./lib/RestApi");
-
-let { authparams } = require("./cred");
+const { loginShoonya, getPositions } = require("./helper");
 
 api = new Api({});
 
-api.login(authparams)
-.then((res) => {        
-        
-        console.log('Reply: ', res);
-        return;
+const init = async () => {
+  await loginShoonya();
+  getPositions();
+};
 
-    }).catch((err) => {
-        console.error(err);
-    });
-
+init();
