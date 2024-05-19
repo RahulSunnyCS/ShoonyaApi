@@ -1,8 +1,25 @@
-module.exports.authparams = {
-  userid: "FA93573",
-  password: "Shoonya1@13$",
-  twoFA: "5HD6MQUT3U4YI47TGZ53LO2525J2UD6G",
-  vendor_code: "FA93573_U",
-  api_secret: "e0176032d884ab4c72ed936f0495aca0",
-  imei: "abc1234",
+const speakeasy = require("speakeasy");
+module.exports.getAuthparams = () => {
+  const {
+    FV_USER_ID: userid,
+    FV_PASSWORD: password,
+    FV_SECRET: twoFA,
+    FV_API_SECRET: api_secret,
+    FV_VENDOR_CODE: vendor_code,
+    FV_IMEI: imei,
+  } = process.env || {};
+  let authparams = {
+    userid,
+    password,
+    twoFA,
+    vendor_code,
+    api_secret,
+    imei,
+  };
+  const totpToken = speakeasy.totp({
+    secret: authparams.twoFA,
+    encoding: "base32",
+  });
+  authparams.twoFA = totpToken;
+  return authparams;
 };

@@ -5,6 +5,10 @@ const { init } = require("./lib/shoonyaHelpers");
 const { getDayWiseAlgos, deleteAlgos } = require("./lib/QuantiplyApis");
 const { getPreviousDay, getCurrentDay } = require("./helpers");
 const app = express();
+const dotenv = require("dotenv");
+
+// Load environment variables from .env file
+dotenv.config();
 const api = new Api({});
 
 // Define a port
@@ -13,12 +17,8 @@ const port = 3000;
 // Middleware to parse JSON
 app.use(express.json());
 
-// Example function
 async function initialiseApp(req, res, api) {
   const result = await init(api);
-  const prevDay = getPreviousDay();
-  const currentDay = getCurrentDay();
-  await deleteAlgos(prevDay);
   res.send(result);
 }
 

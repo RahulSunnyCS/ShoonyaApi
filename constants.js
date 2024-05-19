@@ -29,15 +29,7 @@ module.exports.INDEX_INDICES = {
   NIFTY: 4,
   SENSEX: 5,
 };
-module.exports.DAYS_OF_WEEK = [
-  "SUN",
-  "MON",
-  "TUE",
-  "WED",
-  "THUR",
-  "FRI",
-  "SAT",
-];
+module.exports.DAYS_OF_WEEK = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 module.exports.MONTHS_OF_YEAR = [
   "JAN",
   "FEB",
