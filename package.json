@@ -7,7 +7,8 @@
     "lib": "lib"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +16,11 @@
   "dependencies": {
     "axios": "^0.21.4",
     "crypto-js": "^4.1.1",
+    "express": "^4.19.2",
+    "speakeasy": "^2.0.0",
     "ws": "^7.4.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
   }
 }
