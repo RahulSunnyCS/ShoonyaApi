@@ -12,7 +12,7 @@ dotenv.config();
 const api = new Api({});
 
 // Define a port
-const port = 3000;
+const port = process.env.PORT || 8000;
 
 // Middleware to parse JSON
 app.use(express.json());

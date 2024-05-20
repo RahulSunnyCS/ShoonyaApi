@@ -1,3 +1,4 @@
+const speakeasy = require("speakeasy");
 const { MONTHS_OF_YEAR, DAYS_OF_WEEK } = require("./constants");
 module.exports.getPositions = async () => {
   try {
@@ -28,3 +29,11 @@ module.exports.getFormattedDate = () => {
   const month = MONTHS_OF_YEAR[currentDate.getMonth()];
   return `${day.toString().padStart(2, "0")}${month}`;
 };
+
+module.exports.getTotp = (secretKey) => {
+  const totpToken = speakeasy.totp({
+    secret: secretKey,
+    encoding: "base32",
+  });
+  return totpToken
+}

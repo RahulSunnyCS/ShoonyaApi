@@ -1,4 +1,5 @@
-const speakeasy = require("speakeasy");
+const { getTotp } = require("./helpers");
+
 module.exports.getAuthparams = () => {
   const {
     FV_USER_ID: userid,
@@ -11,15 +12,10 @@ module.exports.getAuthparams = () => {
   let authparams = {
     userid,
     password,
-    twoFA,
     vendor_code,
     api_secret,
     imei,
+    twoFA: getTotp(twoFA)
   };
-  const totpToken = speakeasy.totp({
-    secret: authparams.twoFA,
-    encoding: "base32",
-  });
-  authparams.twoFA = totpToken;
   return authparams;
 };
