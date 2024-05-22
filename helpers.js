@@ -35,5 +35,5 @@ module.exports.getTotp = (secretKey) => {
     secret: secretKey,
     encoding: "base32",
   });
-  return totpToken
-}
+  return totpToken;
+};
