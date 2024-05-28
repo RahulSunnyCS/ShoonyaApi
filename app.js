@@ -1,12 +1,13 @@
 const Api = require("./lib/RestApi");
 const QuantApi = require("./lib/quantiplySessions");
-// Import express
 const express = require("express");
 const { init } = require("./lib/shoonyaHelpers");
 const { getDayWiseAlgos, deleteAlgos } = require("./lib/QuantiplyApis");
 const { getPreviousDay, getCurrentDay } = require("./helpers");
 const app = express();
 const dotenv = require("dotenv");
+const cron = require("node-cron");
+const fetchAndProcessData = require("./jobs/fetchAndProcessData");
 
 // Load environment variables from .env file
 dotenv.config();
@@ -32,4 +33,30 @@ app.get("/init", (req, res) => {
 // Start the server
 app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`);
+});
+
+// Schedule the cron job to run at 8:30 AM every weekday (Monday to Friday)
+cron.schedule("1 9 * * 1-5", () => {
+  console.log(
+    "Running the fetch and process data task at 8:30 AM on a weekday"
+  );
+  fetchAndProcessData();
+});
+// Schedule the cron job to start at 9:15 AM and then run every 2 minutes until 3:30 PM
+cron.schedule("*/2 9-14 * * 1-5", () => {
+  const currentHour = new Date().getHours();
+  const currentMinute = new Date().getMinutes();
+  if (currentHour === 14 && currentMinute === 28) {
+    console.log("Stopping the cron job at 3:28 PM");
+    return cron.destroy();
+  } else if (
+    currentHour >= 9 &&
+    (currentHour > 9 || currentMinute >= 15) &&
+    currentHour < 14
+  ) {
+    console.log(
+      "Running the fetch and process data task every 2 minutes on a weekday starting from 9:15 AM"
+    );
+    // fetchAndProcessData();
+  }
 });

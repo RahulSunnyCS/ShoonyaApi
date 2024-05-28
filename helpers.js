@@ -30,6 +30,13 @@ module.exports.getFormattedDate = () => {
   return `${day.toString().padStart(2, "0")}${month}`;
 };
 
+module.exports.getFormattedDateWithYear = () => {
+  const formattedDate = this.getFormattedDate();
+  const currentDate = new Date();
+  const year = currentDate.getFullYear();
+  return `${formattedDate}${year}`;
+};
+
 module.exports.getTotp = (secretKey) => {
   const totpToken = speakeasy.totp({
     secret: secretKey,
