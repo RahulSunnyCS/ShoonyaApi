@@ -35,12 +35,11 @@ app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`);
 });
 
-// Schedule the cron job to run at 8:30 AM every weekday (Monday to Friday)
-cron.schedule("1 9 * * 1-5", () => {
-  console.log(
-    "Running the fetch and process data task at 8:30 AM on a weekday"
-  );
-  fetchAndProcessData();
+cron.schedule("58 18 * * 1-5", () => {
+  console.log("Running the init task at 8:30 AM on a weekday");
+  init(api, quantApi).then((data) => {
+    console.log("Init task completed", data);
+  });
 });
 // Schedule the cron job to start at 9:15 AM and then run every 2 minutes until 3:30 PM
 cron.schedule("*/2 9-14 * * 1-5", () => {

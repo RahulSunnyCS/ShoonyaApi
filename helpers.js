@@ -33,7 +33,7 @@ module.exports.getFormattedDate = () => {
 module.exports.getFormattedDateWithYear = () => {
   const formattedDate = this.getFormattedDate();
   const currentDate = new Date();
-  const year = currentDate.getFullYear();
+  const year = currentDate.getFullYear() % 100;
   return `${formattedDate}${year}`;
 };
 
