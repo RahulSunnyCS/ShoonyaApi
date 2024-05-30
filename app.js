@@ -1,7 +1,7 @@
 const Api = require("./lib/RestApi");
 const QuantApi = require("./lib/quantiplySessions");
 const express = require("express");
-const { init } = require("./lib/shoonyaHelpers");
+const { init, login, subscribeToOptionData } = require("./lib/shoonyaHelpers");
 const { getDayWiseAlgos, deleteAlgos } = require("./lib/QuantiplyApis");
 const { getPreviousDay, getCurrentDay } = require("./helpers");
 const app = express();
@@ -21,8 +21,12 @@ const port = process.env.PORT || 8000;
 app.use(express.json());
 
 async function initialiseApp(req, res, api, quantApi) {
-  const result = await init(api, quantApi);
-  res.send(result);
+  const { optionChain, index, atmValue, strPrcMappedWithToken } = await init(
+    api,
+    quantApi
+  );
+  await subscribeToOptionData(api, strPrcMappedWithToken[atmValue]);
+  res.send({ optionChain, index, atmValue, strPrcMappedWithToken });
 }
 
 // Route to trigger the function
@@ -35,17 +39,17 @@ app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`);
 });
 
-cron.schedule("58 18 * * 1-5", () => {
+cron.schedule("40 8 * * 1-5", () => {
   console.log("Running the init task at 8:30 AM on a weekday");
-  init(api, quantApi).then((data) => {
-    console.log("Init task completed", data);
+  login(api).then((data) => {
+    console.log("Shoonya login successful");
   });
 });
 // Schedule the cron job to start at 9:15 AM and then run every 2 minutes until 3:30 PM
 cron.schedule("*/2 9-14 * * 1-5", () => {
   const currentHour = new Date().getHours();
   const currentMinute = new Date().getMinutes();
-  if (currentHour === 14 && currentMinute === 28) {
+  if (currentHour === 15 && currentMinute === 28) {
     console.log("Stopping the cron job at 3:28 PM");
     return cron.destroy();
   } else if (
