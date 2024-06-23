@@ -13,6 +13,7 @@ const AWS = require("aws-sdk");
 const fs = require("fs");
 const bodyParser = require("body-parser");
 const fetchAndProcessData = require("./jobs/fetchAndProcessData");
+const { loginAngelOne, loginShoonya } = require("./helper");
 
 // Load environment variables from .env file
 dotenv.config();
@@ -85,10 +86,15 @@ app.put("/update-trade", async (req, res) => {
 });
 
 // Route to trigger the function
-app.get("/init", (req, res) => {
-  initialiseApp(req, res, api, quantApi);
+app.get("/init", async (req, res) => {
+  const response = await loginShoonya();
+  res.send(response);
 });
-
+// Route to trigger smart-api
+app.get("/smart-api",async (req, res)=>{
+  const result = await loginAngelOne();
+  res.send({result})
+})
 // Start the server
 app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`);
