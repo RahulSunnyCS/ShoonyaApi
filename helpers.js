@@ -6,16 +6,16 @@ module.exports.getPositions = async () => {
   } catch (err) {}
 };
 
+module.exports.getDayIndex  = () => new Date().getDay();
+
 module.exports.getCurrentDay = () => {
-  const currentDate = new Date();
-  const dayIndex = currentDate.getDay();
+  const dayIndex = this.getDayIndex();
   const dayName = DAYS_OF_WEEK[dayIndex];
   return dayName;
 };
 
 module.exports.getPreviousDay = () => {
-  const currentDate = new Date();
-  const dayIndex = currentDate.getDay();
+  const dayIndex = this.getDayIndex();
   //If current day is saturday, sunday and monday, then prevDay should be Friday
   const prevDayIndex =
     dayIndex === 0 || dayIndex === 1 || dayIndex === 6 ? 5 : dayIndex - 1;
@@ -25,7 +25,7 @@ module.exports.getPreviousDay = () => {
 
 module.exports.getFormattedDate = () => {
   const currentDate = new Date();
-  const day = currentDate.getDate();
+  const day = this.getDayIndex();
   const month = MONTHS_OF_YEAR[currentDate.getMonth()];
   return `${day.toString().padStart(2, "0")}${month}`;
 };
