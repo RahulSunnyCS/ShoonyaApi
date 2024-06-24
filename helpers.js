@@ -25,7 +25,7 @@ module.exports.getPreviousDay = () => {
 
 module.exports.getFormattedDate = () => {
   const currentDate = new Date();
-  const day = this.getDayIndex();
+  const day = currentDate.getDate();
   const month = MONTHS_OF_YEAR[currentDate.getMonth()];
   return `${day.toString().padStart(2, "0")}${month}`;
 };

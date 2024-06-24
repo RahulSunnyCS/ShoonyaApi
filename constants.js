@@ -44,6 +44,7 @@ module.exports.MONTHS_OF_YEAR = [
   "NOV",
   "DEC",
 ];
+module.exports.BFOINDICES = ["BANKEX","SENSEX"];
 module.exports.INDEX_DETAILS = [
   {
     name: "NIFTY MID SELECT",
