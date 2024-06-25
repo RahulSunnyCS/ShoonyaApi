@@ -1,6 +1,7 @@
 require("dotenv").config();
 const Api = require("./lib/RestApi");
 const QuantApi = require("./lib/quantiplySessions");
+const AutraData = require("./lib/autraData");
 const express = require("express");
 const { init } = require("./lib/shoonyaHelpers");
 const { getDayWiseAlgos, deleteAlgos } = require("./lib/QuantiplyApis");
@@ -13,12 +14,13 @@ const AWS = require("aws-sdk");
 const fs = require("fs");
 const bodyParser = require("body-parser");
 const fetchAndProcessData = require("./jobs/fetchAndProcessData");
-const { loginAngelOne, loginShoonya } = require("./helper");
+const { loginAngelOne, loginShoonya, createws2Connection } = require("./helper");
 
 // Load environment variables from .env file
 dotenv.config();
 const api = new Api({});
 const quantApi = new QuantApi({});
+const autraData = new AutraData();
 
 // Configure AWS SDK
 AWS.config.update({
@@ -92,7 +94,12 @@ app.get("/init", async (req, res) => {
 });
 // Route to trigger smart-api
 app.get("/smart-api",async (req, res)=>{
-  const result = await loginAngelOne();
+  const result = await loginAngelOne(autraData);
+  res.send({result})
+})
+
+app.get("/smart-ws-2",async (req, res)=>{
+  const result = await createws2Connection(autraData, req.body);
   res.send({result})
 })
 // Start the server
