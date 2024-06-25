@@ -1,6 +1,5 @@
 const speakeasy = require("speakeasy");
 const Api = require("./lib/RestApi");
-const AutraData = require("./lib/autraData");
 const WebSocket2 = require("ws");
 let { SmartAPI, WebSocket, WebSocketV2 } = require("smartapi-javascript");
 
@@ -26,14 +25,12 @@ api = new Api({});
 let smart_api = new SmartAPI({
   api_key: AO_API_KEY,
 });
-module.exports.loginShoonya = async () => {
+module.exports.loginShoonya = async (api) => {
   try {
-    // Generate TOTP based on the secret
     const totpToken = speakeasy.totp({
       secret: process.env.FV_TWO_FA,
       encoding: "base32",
     });
-
     authparams.twoFA = totpToken;
     const response = await api.login(authparams);
     console.log("login successful to Shoonya");
@@ -63,46 +60,6 @@ module.exports.loginAngelOne = async (autraData) => {
     console.error("login to Angel One failed", err);
   }
 };
-
-// module.exports.createws2Connection = async () => {
-//   const totpToken = speakeasy.totp({
-//     secret: process.env.AO_TWO_FA,
-//     encoding: "base32",
-//   });
-//   const response = await smart_api.generateSession(
-//     AO_USER_ID,
-//     AO_PASSWORD,
-//     totpToken
-//   );
-//   const payload = {
-//     jwttoken: response.data.jwtToken,
-//     apikey: AO_API_KEY,
-//     clientcode: AO_USER_ID,
-//     feedtype: response.data.feedToken,
-//   };
-//   let web_socket = new WebSocketV2(payload);
-//   // for mode, action and exchangeTypes , can use values from constants file.
-//   try {
-//     const startTime = new Date();
-//     let firstCount = 0;
-//     let secondCount = 0;
-//     await web_socket.connect();
-//     let json_req = {
-//       correlationID: "correlation_id",
-//       action: 1,
-//       mode: 2,
-//       exchangeType: 5,
-//       tokens: ["431310", "431243"],
-//     };
-//     web_socket.fetchData(json_req);
-//     web_socket.on("tick", receiveTick);
-//     function receiveTick(data) {
-//       console.log("receiveTick:::::", new Date() - startTime, data.token, data.token === '431243' ? ++firstCount : ++secondCount);
-//     }
-//   } catch (err) {
-//     console.log(err);
-//   }
-// };
 
 const clients = [];
 const sumValues = [];

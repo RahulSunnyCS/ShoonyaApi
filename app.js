@@ -38,8 +38,8 @@ const port = process.env.PORT || 8000;
 app.use(express.json());
 app.use(bodyParser.json());
 
-async function initialiseApp(req, res, api, quantApi) {
-  const result = await init(api, quantApi);
+async function initialiseApp(req, res) {
+  const result = await init(api, autraData);
   res.send(result);
 }
 
@@ -89,7 +89,8 @@ app.put("/update-trade", async (req, res) => {
 
 // Route to trigger the function
 app.get("/init", async (req, res) => {
-  const response = await loginShoonya();
+  // const response = await loginShoonya(api);
+  const response = await initialiseApp(req, res)
   res.send(response);
 });
 // Route to trigger smart-api
