@@ -2,6 +2,7 @@ const speakeasy = require("speakeasy");
 const Api = require("./lib/RestApi");
 const WebSocket2 = require("ws");
 let { SmartAPI, WebSocket, WebSocketV2 } = require("smartapi-javascript");
+const { getATMValue } = require("./lib/shoonyaHelpers");
 
 const {
   FV_USER_ID,
@@ -63,6 +64,7 @@ module.exports.loginAngelOne = async (autraData) => {
 
 const clients = [];
 const sumValues = [];
+const derivativeSumValues = [];
 module.exports.authenticateAOApis = async (autraData) => {
   let { aoJwtToken } = autraData;
   if (aoJwtToken) {
@@ -70,7 +72,7 @@ module.exports.authenticateAOApis = async (autraData) => {
   }
   return await this.loginAngelOne(autraData);
 };
-module.exports.createws2Connection = async (autraData, reqData) => {
+module.exports.createws2Connection = async (autraData, api) => {
   const { aoJwtToken, aoFeedToken } = await this.authenticateAOApis(autraData);
   const payload = {
     jwttoken: aoJwtToken,
@@ -78,22 +80,26 @@ module.exports.createws2Connection = async (autraData, reqData) => {
     clientcode: process.env.AO_USER_ID,
     feedtype: aoFeedToken,
   };
-
+  const tokenData = autraData.indexData["BANKNIFTY"];
   let web_socket = new WebSocketV2(payload);
-  let ceValue = 0;
-  let peValue = 0;
-
+  let atmceValue = 0;
+  let atmpeValue = 0;
+  let nxtceValue = 0;
+  let nxtpeValue = 0;
+  let prevceValue = 0;
+  let prevpeValue =0;
+  let atmSumValue = 0, otmSumValue = 0, itmSumValue = 0, totalSum = 0;
   try {
     let weightedRateOfChange = 0;
-    let sumValue = 0;
+    const tokenArray = Object.values(tokenData);
 
     await web_socket.connect();
     let json_req = {
-      correlationID: "correlation_id",
+      correlationID: "banknifty",
       action: 1,
       mode: 2,
-      exchangeType: 5,
-      tokens: ["432309", "432359"],
+      exchangeType: 2,
+      tokens:tokenArray,
     };
 
     web_socket.fetchData(json_req);
@@ -101,24 +107,42 @@ module.exports.createws2Connection = async (autraData, reqData) => {
       if (sumValues.length >= 10) {
         sumValues.shift();
       }
-      sumValues.push(sumValue);
+      sumValues.push(totalSum);
       weightedRateOfChange = calculateWeightedRateOfChange(sumValues);
       console.log(
         "weightedRateOfChangeTick::::::",
         weightedRateOfChange,
-        sumValue
+        totalSum
       );
     }, 10000);
+    setInterval(async ()=>{
+      const atmValue  = await getATMValue(api, "BANKNIFTY")
+    },30000)
     web_socket.on("tick", (data) => {
-      if (data.token === "432309") {
-        ceValue = Number(data.last_traded_price); // Assuming ltp is the latest price
-      } else if (data.token === "432359") {
-        peValue = Number(data.last_traded_price); // Assuming ltp is the latest price
+      if (data.token === tokenData.atmCE) {
+        atmceValue = Number(data.last_traded_price);
+        atmSumValue = atmceValue + atmpeValue; 
+      } else if (data.token === tokenData.atmPE) {
+        atmpeValue = Number(data.last_traded_price);
+        atmSumValue = atmceValue + atmpeValue;
       }
-
-      sumValue = ceValue + peValue;
-      broadcast({ sum: sumValue, weightedRateOfChange });
-      // console.log("receiveTick:::::", new Date() - startTime, sumValue, peValue, ceValue);
+      if (data.token === tokenData.nxtCE) {
+        nxtceValue = Number(data.last_traded_price);
+        otmSumValue = nxtceValue + prevpeValue;
+      } else if (data.token === tokenData.atmPE) {
+        nxtpeValue = Number(data.last_traded_price);
+        itmSumValue = prevceValue + nxtpeValue;
+      }
+      if (data.token === tokenData.atmCE) {
+        prevceValue = Number(data.last_traded_price);
+        itmSumValue = prevceValue + nxtpeValue; 
+      } else if (data.token === tokenData.atmPE) {
+        prevpeValue = Number(data.last_traded_price); 
+        otmSumValue = nxtceValue + prevpeValue;
+      }
+      totalSum = atmSumValue + otmSumValue + itmSumValue;
+      broadcast({ atmSum: atmSumValue,otmSumValue, itmSumValue, weightedRateOfChange });
+      // console.log("receiveTick:::::", atmSumValue, otmSumValue, itmSumValue, totalSum);
     });
   } catch (err) {
     console.log(err);

@@ -100,8 +100,15 @@ app.get("/smart-api",async (req, res)=>{
 })
 
 app.get("/smart-ws-2",async (req, res)=>{
-  const result = await createws2Connection(autraData, req.body);
+  await initialiseApp(req, res)
+  const result = await createws2Connection(autraData, api);
   res.send({result})
+})
+
+app.get("/limits", async(req, res)=>{
+  await loginShoonya(api);
+  const limits  = await api.get_limits();
+  res.send(limits);
 })
 // Start the server
 app.listen(port, () => {
